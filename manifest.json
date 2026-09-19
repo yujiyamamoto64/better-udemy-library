@@ -5,9 +5,19 @@
   "description": "Interface alternativa e leve para visualizar todos os seus cursos da Udemy, sem as limitações de paginação da página My Learning.",
   "action": {},
   "background": {
+    "scripts": ["src/background/background.js"],
     "service_worker": "src/background/background.js",
     "type": "module"
   },
   "permissions": ["storage"],
-  "host_permissions": ["https://www.udemy.com/api-2.0/*"]
+  "host_permissions": ["https://www.udemy.com/api-2.0/*"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "better-udemy-library@local.extension",
+      "strict_min_version": "121.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
 }

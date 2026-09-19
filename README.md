@@ -1,6 +1,6 @@
 # Better Udemy Library
 
-An unofficial, lightweight browser extension (Chrome/Edge) that gives you a fast,
+An unofficial, lightweight browser extension (Firefox, Chrome, and Edge) that gives you a fast,
 independent way to browse **your own** Udemy courses — without the pagination and
 repeated "Ver mais" clicks of the official "My Learning / Lists" page.
 
@@ -33,7 +33,7 @@ zero extra requests to Udemy).
 
 1. You click the extension icon.
 2. A new tab opens with the extension's own page (`src/pages/library/library.html`).
-3. That page checks `chrome.storage.local` for a cached course list and renders it
+3. That page checks the browser's local extension storage for a cached course list and renders it
    immediately if present.
 4. You can click **Atualizar** ("Refresh") to fetch fresh data. The extension calls
    Udemy's own `subscribed-courses-collections` API endpoint using `fetch(...,
@@ -65,7 +65,7 @@ Browser Extension
 | `UdemyApiClient` | The **only** module that knows Udemy's endpoint URL, query params, and raw JSON shape. Handles HTTP, pagination, and error classification (auth / HTTP / network). |
 | `CourseMapper` | The **only other** module allowed to read Udemy-specific fields (`completion_ratio`, `image_480x270`, `visible_instructors`, `published_title`, etc.). Converts raw JSON into the internal `Course` model. |
 | `CourseService` | Loads courses (cache or network), deduplicates by `course.id`, and implements search / filter / sort — all client-side, all on the internal model. |
-| `CourseStorage` | Thin wrapper around `chrome.storage.local` for caching `{ courses, updatedAt }`. |
+| `CourseStorage` | Thin wrapper around the WebExtension local storage API for caching `{ courses, updatedAt }`. |
 | Library UI (`components/CourseCard.js`, `pages/library/*`) | Pure presentation. Renders the internal `Course` model; knows nothing about Udemy's API. |
 
 **Everything below `CourseMapper` in the diagram works only with the internal
@@ -91,6 +91,8 @@ Browser Extension
 
 ## Installation (unpacked / development)
 
+### Chrome / Edge
+
 1. Clone or download this repository.
 2. Open `chrome://extensions` (or `edge://extensions`).
 3. Enable **Developer mode** (top-right toggle).
@@ -99,6 +101,17 @@ Browser Extension
 5. Make sure you're logged into [udemy.com](https://www.udemy.com) in the same
    browser.
 6. Click the extension's icon in the toolbar — a new tab opens with your library.
+
+### Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on**.
+3. Select this repository's `manifest.json` file.
+4. Make sure you're logged into [udemy.com](https://www.udemy.com) in Firefox.
+5. Click the extension's icon in the toolbar.
+
+Firefox removes temporary add-ons when the browser restarts. A persistent end-user
+installation requires a package signed by Mozilla.
 
 No build step, no `npm install`, no bundler — it's plain ES modules loaded
 directly by the browser.
@@ -109,8 +122,9 @@ The project is intentionally dependency-free vanilla JS (ES Modules), HTML and C
 running under Manifest V3. To iterate:
 
 1. Edit files under `src/`.
-2. Go to `chrome://extensions` and click the reload icon on the extension card
-   (or reload the library tab if you only changed `pages/library/*`).
+2. Reload the extension from `chrome://extensions` on Chrome/Edge or from
+   `about:debugging#/runtime/this-firefox` on Firefox (or reload the library tab
+   if you only changed `pages/library/*`).
 3. Re-open the library tab to see changes.
 
 There is currently no automated test suite — this is a good area for
@@ -128,7 +142,7 @@ lightweight runner, since they have no DOM/browser dependency).
 - All requests go directly from your browser to `www.udemy.com`. There is no
   extension backend, proxy, analytics, or third-party server involved.
 - The only data persisted is your mapped course list and a timestamp, stored
-  locally via `chrome.storage.local` (never synced, never sent anywhere).
+  in the browser's local extension storage (never synced, never sent anywhere).
 
 ## Limitations
 
